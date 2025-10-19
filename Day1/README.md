@@ -15,7 +15,7 @@ The NMOS (N-channel Metal-Oxide-Semiconductor) transistor is a fundamental build
 
 The device is constructed on a P-type substrate with N+ source and drain regions. A thin oxide layer separates the polysilicon gate from the channel region, providing electrical isolation while allowing electrostatic control.
 
-![NMOS Transistor Structure](assets/1.png)
+![NMOS Transistor Structure](assets/NMOS.png)
 
 ### Physical Operation Principles
 
@@ -196,8 +196,8 @@ plot id(M1)
 - Process variation corners (typical, fast, slow)
 - Temperature coefficients
 
-![SPICE Model File Structure](assets/2.png)
-
+![SPICE Model File Structure](assets/1.png)
+![SPICE Model File Structure2](assets/2.png)
 **Sky130 Process**: Open-source 130nm technology providing:
 - Complete device models (NMOS, PMOS, resistors, capacitors)
 - Multiple process corners for design verification
