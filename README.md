@@ -4,6 +4,15 @@
 
 This repository contains comprehensive documentation and analysis for Week 4 of the VSD RISC-V SOC Tapeout Program. The focus is on understanding fundamental circuit design principles, MOSFET device physics, and SPICE simulation techniques essential for modern IC design.
 
+## Quick Navigation
+| Day | Topic | Link |
+|-----|-------|------|
+| 1 | Fundamentals of Circuit Design and SPICE Simulation | [Day 1](Day1/README.md) |
+| 2 | Advanced SPICE Analysis and Channel Length Effects | [Day 2](Day2/README.md) |
+| 3 | VTC Simulation and Timing Analysis | [Day 3](Day3/README.md) |
+| 4 | Noise Margin Analysis and Circuit Robustness | [Day 4](Day4/README.md) |
+| 5 | Power Scaling and Process Variation Analysis | [Day 5](Day5/README.md) |
+
 ## Course Overview
 
 ### Core Learning Objectives
@@ -54,6 +63,43 @@ This repository contains comprehensive documentation and analysis for Week 4 of 
 ├── Day5/          # Power Scaling and Process Variations
 └── README.md      # This overview document
 ```
+
+## Daily Contents
+
+### [📘 Day 1: Fundamentals of Circuit Design and SPICE Simulation](Day1/README.md)
+- NMOS transistor architecture and operation principles
+- Threshold voltage analysis and body effect
+- Operating regions (cut-off, linear, saturation)
+- Introduction to SPICE simulation and netlist structure
+- Device physics and PN junction fundamentals
+
+### [📊 Day 2: Advanced SPICE Analysis and Channel Length Effects](Day2/README.md)
+- Long-channel vs short-channel MOSFET comparison
+- Velocity saturation effects in modern devices
+- Four regions of operation in short-channel devices
+- CMOS inverter fundamentals and switch analysis
+- Voltage Transfer Characteristics (VTC) derivation
+
+### [⚡ Day 3: VTC Simulation and Timing Analysis](Day3/README.md)
+- Complete CMOS inverter VTC analysis
+- Switching threshold calculation and optimization
+- Rise time and fall time characterization
+- Device sizing impact on performance metrics
+- Timing parameter extraction techniques
+
+### [🛡️ Day 4: Noise Margin Analysis and Circuit Robustness](Day4/README.md)
+- Digital logic level definitions (VIL, VIH, VOL, VOH)
+- Noise margin calculation from VTC curves
+- Process variation impact on noise margins
+- Design guidelines for robust operation
+- Reliability and manufacturability considerations
+
+### [⚙️ Day 5: Power Scaling and Process Variation Analysis](Day5/README.md)
+- Supply voltage scaling effects on performance
+- Power consumption analysis and optimization
+- Process variation modeling and impact
+- Device sizing strategies for power-performance trade-offs
+- Advanced design techniques for modern processes
 
 ## Prerequisites
 
