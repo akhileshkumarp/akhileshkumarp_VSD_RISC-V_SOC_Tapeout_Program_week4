@@ -1,373 +1,94 @@
 # Day 3: VTC Simulation and Timing Analysis
 
 ## Overview
-This document provides comprehensive coverage of CMOS inverter characterization through SPICE simulation. We explore voltage transfer characteristic (VTC) analysis, timing parameter extraction, switching threshold derivation, and the impact of transistor sizing on performance metrics.
+This document will give you a step by step process on how to write a SPCIE deck for a CMOS inverter and perform simulations to obtain the VTC curve and also calculate rise time and fall time from transient simulations.We deepdive into second - order effects like switching threshold (Vm) and derive equations to find Vm as a function of W/L and vice versa. We have also performed transient analysis for CMOS inverters with varrying the width of PMOS transistors as a multiple of NMOS transistors (Wp/Lp=x.Wn/Ln) and compared the resulting rise and fall times, determining which pair is best suited for which application.
 
-## CMOS Inverter SPICE Simulation Methodology
+# VTC SPICE Simulation
+The steps required to perform SPICE simulation to obtain the VTC curve are
+- Component connectivity - Connect the components in the right manner. 
+- Component values - Give component values like (W/L)n, (W/L)p, Vin, Vdd, Cload ect.
+- Identify the nodes - Creating nodes is essential to write SPICE code.
+- Name the nodes - Give suitable names to nodes that can be furhter used to write SPICE code. 
+- Write the SPICE code - Define the circuit in terms of SPICE code along with the type of simulation that needs to be performed and link the requiered library file.
 
-### Circuit Setup and Node Identification
+![CMOS Invertor](assets/CMOS%20Invertor%20.png)
 
-For accurate SPICE simulation of a CMOS inverter, proper circuit connectivity and node naming are essential:
+The SPICE code for the above transistor is given below 
+![Inverter SPICE code](assets/DC%20Analysis.png)
 
-**Circuit Components:**
-- NMOS transistor (pull-down network)
-- PMOS transistor (pull-up network)  
-- Input voltage source
-- Supply voltage source
-- Load capacitance
-- Proper node connections
+Use this command inside ngspice environment
 
-**Node Naming Convention:**
-- `vin`: Input node
-- `vout`: Output node  
-- `vdd`: Supply voltage node
-- `0`: Ground reference node
-
-### Complete SPICE Netlist for VTC Analysis
-
-```spice
-* CMOS Inverter VTC Analysis
-* Circuit Description
-Mn1 vout vin 0 0 nmos W=0.36u L=0.15u
-Mp1 vout vin vdd vdd pmos W=1.08u L=0.15u
-Cload vout 0 10f
-
-* Voltage Sources
-VDD vdd 0 1.8
-Vin vin 0 0.9
-
-* Include Technology Models
-.include "sky130_fd_pr/models/nfet_01v8.spice"
-.include "sky130_fd_pr/models/pfet_01v8.spice"
-
-* DC Analysis for VTC
-.dc Vin 0 1.8 0.01
-
-* Control Commands
-.control
-run
-plot vout vs vin
-.endc
-
-.end
+```bash
+plot out vs in
 ```
 
-### DC Analysis Configuration
+The output of DC analysis is a VTC curve as follows
+![VTC curve](assets/VTC%20curve.png)
 
-**Parameter Settings:**
-- **Start voltage**: 0V (logic low)
-- **End voltage**: 1.8V (supply voltage)
-- **Step size**: 0.01V (sufficient resolution for smooth curve)
+# Calculating Rise and Fall Times
+To figure out the rise time and fall time of your output, we perform transient analysis on the same SPICE deck, except change the type of simulation from `.dc` to `.tran`. The Spice code for the same is given below:
 
-**Expected Output**: VTC curve showing output voltage as function of input voltage
+![Transient Analysis](assets/Transient%20Analysis.png)
 
-## Voltage Transfer Characteristic (VTC) Analysis
+Use this command inside the ngspice environment 
 
-### VTC Curve Interpretation
-
-The VTC curve reveals critical inverter characteristics:
-
-1. **Logic High Output (VOH)**: Output voltage for low input
-2. **Logic Low Output (VOL)**: Output voltage for high input  
-3. **Switching Threshold (Vm)**: Input voltage where Vout = Vin
-4. **Transition Region**: Region where output switches between logic levels
-5. **Noise Margins**: Tolerance to input noise
-
-### Key VTC Parameters
-
-**VOH (Output High Voltage):**
-- Ideally equals VDD
-- Determines logic '1' level
-- Affected by PMOS sizing and threshold voltage
-
-**VOL (Output Low Voltage):**
-- Ideally equals 0V
-- Determines logic '0' level  
-- Affected by NMOS sizing and threshold voltage
-
-**Transition Width:**
-- Determines switching sharpness
-- Affects noise immunity
-- Related to device gain in transition region
-
-### Using SPICE Commands for VTC
-
-```spice
-.control
-* Run DC analysis
-run
-
-* Plot VTC curve
-plot vout vs vin
-
-* Find switching threshold
-let vm_line = vin
-plot vout vs vin vm_line vs vin
-
-* Measure specific points
-meas dc voh find vout when vin=0
-meas dc vol find vout when vin=1.8
-.endc
+```bash 
+plot out vs time in
 ```
 
-## Transient Analysis and Timing Characterization
+This gives you the output waveform as such 
+![Dynamic Output](assets/Dynamic%20output.png)
 
-### Transient Simulation Setup
+Now, inorder to calculate the rise time and fall times, we going to use the following regions as shown below:
+![Rise time and Fall time](assets/RTandFT.png)
 
-For timing analysis, we apply a time-varying input signal and observe the output response:
+We use the time value of the waveform at exactly 50% of input voltage, for the above transient waveform, we have a 1.8V input voltage. So at 0.9V we find the time values for input and output to be at :
+![Rise time](assets/zoomed%20in%20at%200.9v.png)
 
-```spice
-* CMOS Inverter Transient Analysis
-* Same circuit as above, but with different sources
+We carry out the same process for fall time and upon doing so, the values of time are:
+![Time values](assets/Calculating%20rise%20and%20fall%20time.png) 
 
-* Input Pulse
-Vin vin 0 PULSE(0 1.8 1n 0.1n 0.1n 2n 5n)
+# Switching Threshold Voltage (Vm)
+The switching threshold voltage (often denoted as Vm) in a CMOS inverter is the input voltage level at which the output voltage equals the input voltage. In other words, it is the point where the voltage transfer characteristic (VTC) curve intersects the line Vout=Vin.This voltage signifies the exact switching point of the inverter where the device transitions from a logic high to logic low or vice versa. From a graph, Vm can be plotted by drawing a 45 degree line from origin as shown below. The intersection point of the strain line and the VTC curve tells use the Vm of the inverter. 
 
-* Transient Analysis
-.tran 0.01n 10n
+![Vm](assets/Vm.png)
 
-.control
-run
-plot vout vs time vin vs time
-.endc
-```
+For the CMOS inverter that we simulated for VTC waveform, the Vm plotted is shown below. It can be seen that the switching threshold voltage for the design we simulated is approximately 0.87V 
+![Simulated vm](assets/simulated%20vm%20.png)
 
-**Pulse Parameters:**
-- **V1 = 0V**: Low voltage level
-- **V2 = 1.8V**: High voltage level
-- **TD = 1n**: Delay time  
-- **TR = 0.1n**: Rise time
-- **TF = 0.1n**: Fall time
-- **PW = 2n**: Pulse width
-- **PER = 5n**: Period
+## Derivation of Vm 
+The switching threshold can be caluculated using the derivations mentioned below. Prior to the derivation, it is to be kept in mind that at the switching point `VGS = VDS = Vm` and `IDSn = -IDSp` 
+### 1. Vm as a function of (W/L)
+![](assets/derivation1.1.png)
+![](assets/der1.2.png)
+![](assets/derv1.3.png)
+![](assets/der1.4.png)
 
-### Rise Time and Fall Time Extraction
+### 2. (W/L) as a function of Vm 
+![](assets/der2.1.png)
+![](assets/der2.2.png)
 
-**Definition of Timing Parameters:**
+# Variaton of (W/L)p 
+For the simulations in this document we are taking L = 0.15u and are varrying the Wp value as a mutile of Wn. Initially Wn is 0.36u. Upone simulation, the obtained values of Vm, Rise time and Fall time are given in the below table. 
 
-**Rise Time (tr)**: Time for output to transition from 10% to 90% of final value
-**Fall Time (tf)**: Time for output to transition from 90% to 10% of initial value
+| Wp/Lp        | Wn/Ln        | Vm                  | Rise Time (ns) | Fall Time (ns)   |
+| ------------ | ------------ | ------------------- | -------------- | ---------------- |
+| Wp/Lp        | 2(Wn/Ln )    | 0.86                | 0.37236        | 0.28334          |
+| Wp/Lp        | 3(Wn/Ln )    | 0.88                | 0.26242        | 0.28519          |
+| Wp/Lp        | 4(Wn/Ln )    | 0.89                | 0.20198        | 0.28710          |
+| Wp/Lp        | 5(Wn/Ln )    | 0.91                | 0.16737        | 0.33824          |
 
-**Alternative Definition (50% points):**
-- **Propagation Delay Rise (tpdr)**: Time difference between 50% input and 50% output during rising transition
-- **Propagation Delay Fall (tpdf)**: Time difference between 50% input and 50% output during falling transition
+Rise time - The time taken by the capacitor to charge completely.\
+Fall time - The time taken by the capacitor to deischarge completely.
 
-### SPICE Measurement Commands
+From the table with the values obtained from simulation using varried Wp values, it can be observed that the rise time reduces as the size increases and fall time increases as size increases. These variations can be useful in various applications where we want the delay of an inverter or buffer to be more or less. 
 
-```spice
-.control
-* Run transient analysis
-run
+But for standard applications the best device is when **rise time = fall time** or approximately equal, as in the case of Wp/Lp = 3(Wn/Ln) from the table. 
 
-* Measure rise time (10%-90%)
-meas tran tr_10_90 trig vout val='0.1*1.8' rise=1 targ vout val='0.9*1.8' rise=1
+With Wp/Lp = 2(Wn/Ln), the delay is more so your signal travels slow. \
+With Wp/Lp = 5(Wn/Ln), the delay is significanlty less, allowing the signal to travel faster. 
 
-* Measure fall time (90%-10%)  
-meas tran tf_90_10 trig vout val='0.9*1.8' fall=1 targ vout val='0.1*1.8' fall=1
-
-* Measure propagation delays (50% points)
-meas tran tpdr trig vin val='0.9' rise=1 targ vout val='0.9' fall=1
-meas tran tpdf trig vin val='0.9' fall=1 targ vout val='0.9' rise=1
-
-* Calculate average propagation delay
-let tpd_avg = (tpdr + tpdf)/2
-print tpd_avg
-.endc
-```
-
-### Manual Timing Measurement
-
-For detailed analysis, extract time points manually:
-
-**Step 1**: Identify 50% voltage levels
-- **50% of VDD**: 0.9V for 1.8V supply
-
-**Step 2**: Find time coordinates
-- Input rising edge at 50%: t_in_rise
-- Output falling edge at 50%: t_out_fall
-- Input falling edge at 50%: t_in_fall  
-- Output rising edge at 50%: t_out_rise
-
-**Step 3**: Calculate delays
-```
-tpdr = t_out_fall - t_in_rise
-tpdf = t_out_rise - t_in_fall
-```
-
-## Switching Threshold Voltage Analysis
-
-### Definition and Significance
-
-The switching threshold voltage (Vm) is the input voltage at which:
-- **Vout = Vin**
-- **Both transistors operate in saturation region**
-- **Maximum current flows through the inverter**
-- **Maximum power dissipation occurs**
-
-Vm determines the noise margins and switching characteristics of the inverter.
-
-### Graphical Determination
-
-Plot the VTC curve with a 45° reference line (Vout = Vin):
-- Intersection point gives Vm value
-- Provides visual indication of switching balance
-
-### Analytical Derivation of Vm
-
-At the switching threshold, both transistors are in saturation with equal currents:
-
-**Conditions at Vm:**
-- VGSn = VGSp = Vm  
-- VDSn = VDSp = Vm
-- IDSn = -IDSp
-
-**NMOS Current (saturation):**
-```
-IDSn = (1/2) μn Cox (Wn/Ln) (Vm - Vthn)²
-```
-
-**PMOS Current (saturation):**
-```
-IDSp = -(1/2) μp Cox (Wp/Lp) (VDD - Vm - |Vthp|)²
-```
-
-**Current Balance Equation:**
-```
-μn Cox (Wn/Ln) (Vm - Vthn)² = μp Cox (Wp/Lp) (VDD - Vm - |Vthp|)²
-```
-
-### Vm as Function of Device Ratios
-
-Defining the ratio **r = (μp Cox (Wp/Lp)) / (μn Cox (Wn/Ln))**:
-
-```
-(Vm - Vthn)² = r (VDD - Vm - |Vthp|)²
-```
-
-Taking square root:
-```
-Vm - Vthn = √r (VDD - Vm - |Vthp|)
-```
-
-Solving for Vm:
-```
-Vm = (Vthn + √r (VDD - |Vthp|)) / (1 + √r)
-```
-
-### Special Case: Matched Inverter
-
-For **r = 1** (equal drive strengths):
-```
-Vm = (Vthn + VDD - |Vthp|) / 2
-```
-
-If **Vthn = |Vthp| = Vth**:
-```
-Vm = VDD / 2
-```
-
-This represents a perfectly balanced inverter with maximum noise margins.
-
-### Device Ratio as Function of Vm
-
-Rearranging the switching threshold equation:
-```
-r = [(Vm - Vthn) / (VDD - Vm - |Vthp|)]²
-```
-
-This allows determination of required device sizing for target Vm.
-
-## Impact of Transistor Sizing on Performance
-
-### Systematic Sizing Study
-
-We analyze the effect of PMOS sizing on inverter characteristics by varying Wp while keeping other parameters constant:
-
-**Base Parameters:**
-- **Ln = Lp = 0.15μm** (minimum length)
-- **Wn = 0.36μm** (base NMOS width)
-- **Wp = k × Wn** (variable PMOS width)
-
-### Simulation Results Analysis
-
-| Wp/Lp Ratio | Vm (V) | Rise Time (ns) | Fall Time (ns) | Comments |
-|-------------|---------|----------------|----------------|----------|
-| 2(Wn/Ln) | 0.86 | 0.372 | 0.283 | Fall time faster |
-| 3(Wn/Ln) | 0.88 | 0.262 | 0.285 | Balanced timing |
-| 4(Wn/Ln) | 0.89 | 0.202 | 0.287 | Rise time optimized |
-| 5(Wn/Ln) | 0.91 | 0.167 | 0.338 | Excessive PMOS |
-
-### Performance Trade-offs
-
-**Rise Time Behavior:**
-- Decreases with increasing PMOS size
-- Due to stronger pull-up capability
-- Limited by load capacitance and PMOS resistance
-
-**Fall Time Behavior:**  
-- Initially stable, then increases
-- NMOS sizing becomes relatively weaker
-- Increased junction capacitance affects speed
-
-**Switching Threshold:**
-- Increases with PMOS size
-- Moves away from VDD/2 for large ratios
-- Affects noise margins asymmetrically
-
-### Optimal Sizing Strategy
-
-**For Balanced Performance:**
-- Choose **Wp/Lp ≈ 3(Wn/Ln)** for equal rise/fall times
-- Provides good noise margins
-- Reasonable power consumption
-
-**For Speed-Critical Applications:**
-- Larger PMOS for faster rise time
-- Accept asymmetric timing if beneficial
-- Consider increased power dissipation
-
-**For Low-Power Applications:**
-- Minimum sizing to meet timing requirements
-- Accept longer delays for reduced power
-- Balance static and dynamic power
-
-### Design Guidelines
-
-1. **Start with balanced sizing** (Wp/Lp = 2-3 × Wn/Ln)
-2. **Verify timing requirements** for specific application
-3. **Check noise margins** for robustness
-4. **Consider process variations** in final sizing
-5. **Validate with complete circuit simulations**
-
-## Advanced Timing Considerations
-
-### Load Capacitance Effects
-
-**Capacitive Loading Sources:**
-- Gate capacitance of driven devices
-- Interconnect capacitance  
-- Junction capacitance
-- Parasitic capacitances
-
-**Impact on Timing:**
-```
-τ = Ron × Cload
-```
-
-Where Ron is the effective on-resistance of the driving transistor.
-
-### Process Variation Impact
-
-**Critical Parameters:**
-- Threshold voltage variations (±σVth)
-- Mobility variations
-- Oxide thickness variations
-- Channel length variations
-
-**Design Margins:**
-- Include 3σ process variations
-- Consider temperature effects (-40°C to 125°C)
-- Account for supply voltage variations (±10%)
+All these simulation results are obtained by varrying the Wp value in the SPICE file. Keep in mind to verify the available Wp values by checking the library files of the device.
 
 ## Summary
 
