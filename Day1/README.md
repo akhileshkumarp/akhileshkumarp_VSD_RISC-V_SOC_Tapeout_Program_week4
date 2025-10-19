@@ -15,6 +15,8 @@ The NMOS (N-channel Metal-Oxide-Semiconductor) transistor is a fundamental build
 
 The device is constructed on a P-type substrate with N+ source and drain regions. A thin oxide layer separates the polysilicon gate from the channel region, providing electrical isolation while allowing electrostatic control.
 
+![NMOS Transistor Structure](assets/1.png)
+
 ### Physical Operation Principles
 
 The NMOS transistor operates based on the principle of field-effect control. When appropriate voltages are applied to the terminals, an electric field created by the gate voltage modulates the conductivity of the channel region beneath the gate oxide.
@@ -194,6 +196,8 @@ plot id(M1)
 - Process variation corners (typical, fast, slow)
 - Temperature coefficients
 
+![SPICE Model File Structure](assets/2.png)
+
 **Sky130 Process**: Open-source 130nm technology providing:
 - Complete device models (NMOS, PMOS, resistors, capacitors)
 - Multiple process corners for design verification
@@ -217,8 +221,15 @@ print id(M1)
 .endc
 ```
 
+![SPICE Netlist Example](assets/3.png) 
+
 ### Interpreting Simulation Results
 
+![ngspice Simulation Output](assets/4.png)
+
+With proper branch analysis, we can see the characteristic curves:
+
+![ID vs VDS Characteristic Curves](assets/5.png) 
 **ID vs VDS Characteristics:**
 - **Linear region**: Current increases linearly with VDS
 - **Saturation region**: Current becomes relatively constant
