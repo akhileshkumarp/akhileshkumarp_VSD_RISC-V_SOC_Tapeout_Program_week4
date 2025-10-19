@@ -21,6 +21,32 @@ The device is constructed on a P-type substrate with N+ source and drain regions
 
 The NMOS transistor operates based on the principle of field-effect control. When appropriate voltages are applied to the terminals, an electric field created by the gate voltage modulates the conductivity of the channel region beneath the gate oxide.
 
+#### PN Junction Formation and Depletion Region
+
+The foundation of NMOS operation lies in the PN junction physics at the substrate-source/drain interfaces. When P-type and N-type materials are brought together, a depletion region forms due to the diffusion of charge carriers.
+
+![PN Junction Diode](assets/pn_junction_diode.png)
+
+The PN junction creates a built-in electric field that prevents further diffusion of carriers. This depletion region is crucial for transistor isolation and proper device operation.
+
+![Depletion Region Formation](assets/Depletion_region.png)
+
+#### Gate Voltage Effects on Channel Formation
+
+When a positive voltage is applied to the gate terminal, it creates an electric field that attracts electrons to the silicon-oxide interface, forming the conductive channel.
+
+![Positive VGS Effect](assets/positive_VGS.png)
+
+As the gate voltage increases beyond the threshold voltage, the channel becomes more conductive, allowing current flow between source and drain terminals.
+
+#### MOS Capacitor Modes
+
+The MOS structure can operate in different modes depending on the applied gate voltage:
+
+**Accumulation Mode**: When negative voltage is applied to the gate (for NMOS), holes accumulate at the oxide-semiconductor interface.
+
+![Accumulation Mode](assets/accumulation.png)
+
 **Key Operating Mechanism:**
 1. **Channel Formation**: When VGS exceeds the threshold voltage, mobile electrons are attracted to the gate-oxide interface
 2. **Current Conduction**: These electrons form a conductive channel connecting source and drain
@@ -35,10 +61,18 @@ The threshold voltage (Vth) represents the minimum gate-to-source voltage requir
 
 When a voltage difference exists between the source and body terminals, it significantly affects the threshold voltage. This phenomenon is known as the **body effect** or **back-gate effect**.
 
+![Source-to-Body Voltage Applied](assets/VSB_applied.png)
+
 **Physical Mechanism:**
 - Positive Vsb increases the depletion region width
 - More gate voltage is required to achieve strong inversion
 - The effective threshold voltage increases
+
+![Channel Formation with VSB](assets/Channel_due_to_VSB.png)
+
+The body effect results in an increased channel width requirement and modified threshold characteristics, which is critical for circuit design in technologies where the body terminal is not always connected to the source.
+
+![Increased Channel Width](assets/Increased_channel_width.png)
 
 **Mathematical Relationship:**
 ```
@@ -121,6 +155,14 @@ The term (1 + λVDS) accounts for **channel length modulation**, where λ is the
 - Effective channel length decreases with increasing VDS
 - Current saturates but shows slight dependence on VDS due to channel length modulation
 
+![Saturation Region Operation](assets/Saturation_Region.png)
+
+In the saturation region, the voltage gradient along the channel becomes non-uniform, with the highest electric field near the drain end where pinch-off occurs.
+
+![Voltage Gradient in Channel](assets/Voltage_Gradient.png)
+
+This voltage gradient creates the pinch-off effect and determines the saturation current characteristics of the transistor.
+
 ## Introduction to SPICE Simulation
 
 ### What is SPICE?
@@ -141,6 +183,14 @@ A SPICE netlist describes the circuit topology, component values, and simulation
 2. Node names can be alphanumeric
 3. Ground node is typically labeled as '0'
 4. Comments begin with '*' or are enclosed in text lines
+
+#### Node Creation and Circuit Connectivity
+
+In SPICE, nodes represent connection points in the circuit. Proper node creation is essential for accurate circuit simulation and analysis.
+
+![Node Creation in SPICE](assets/node_creation.png)
+
+Nodes serve as electrical connection points where multiple circuit elements meet. Each node has a unique name and represents an equipotential point in the circuit.
 
 ### NMOS Device Declaration in SPICE
 
